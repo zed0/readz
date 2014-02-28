@@ -3,6 +3,7 @@ var speed = 60000/WPM;
 var paused = true;
 var current_word = 0;
 var strings = '';
+var in_quote = false;
 
 $.urlParam = function(name){
 	var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -37,6 +38,18 @@ function hl_index(string)
 
 function print_word(string)
 {
+	if(string.slice(0,1) == '"')
+	{
+		in_quote = true;
+	}
+	if(in_quote)
+	{
+		$('#reader').css('color', 'skyblue');
+	}
+	else
+	{
+		$('#reader').css('color', 'white');
+	}
 	var index = hl_index(string);
 	var start = string.substring(0, index);
 	var middle = string.substring(index, index+1);
@@ -49,6 +62,10 @@ function print_word(string)
 	compound_string += end;
 	compound_string += '</span>';
 	$('#back').html(compound_string);
+	if(string.slice(-1) == '"')
+	{
+		in_quote = false;
+	}
 }
 
 function changeSpeed()
@@ -110,6 +127,43 @@ $().ready(function(){
 			{
 				window.setTimeout(repeater, speed);
 			}
+		}
+		if(e.keyCode == 37) //left
+		{
+			current_word-=2;
+			while(
+				current_word >= 0
+				&& strings[current_word].slice(-1).match(/[\.\?\!]/) === null
+			)
+			{
+				current_word--;
+			}
+			if(current_word > 1)
+			{
+				current_word++;
+			}
+			else
+			{
+				current_word = 0;
+			}
+			print_word(strings[current_word]);
+		}
+		if(e.keyCode == 39) //right
+		{
+			current_word++;
+			while(
+				current_word < strings.length
+				&& strings[current_word].slice(-1).match(/[\.\?\!]/) === null
+			)
+			{
+				console.log(current_word);
+				current_word++;
+			}
+			if(current_word < strings.length-1)
+			{
+				current_word++;
+			}
+			print_word(strings[current_word]);
 		}
 	});
 });
