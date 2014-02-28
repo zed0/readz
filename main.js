@@ -4,6 +4,16 @@ var paused = true;
 var current_word = 0;
 var strings = '';
 
+$.urlParam = function(name){
+	var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	if (results==null){
+		return null;
+	}
+	else{
+		return results[1] || 0;
+	}
+}
+
 function hl_index(string)
 {
 	var result = 4;
@@ -58,6 +68,7 @@ var repeater = function(){
 	{
 		print_word(strings[current_word]);
 		current_word++;
+		$('#start').val(current_word);
 		if(!paused)
 		{
 			window.setTimeout(repeater, speed);
@@ -66,11 +77,31 @@ var repeater = function(){
 }
 
 $().ready(function(){
+	strings = reader_text.split(/[ (\n)]+/)
+
 	$('#size').on('input change keyup', function(){changeSize();});
 	$('#speed').on('input change keyup', function(){changeSpeed();});
-	print_word('SPACE');
-	$('#front').prepend('Focus on the red letter and press ');
-	$('#back').append(' to start and pause/unpause');
+
+	if($.urlParam('start')>0)
+	{
+		current_word = $.urlParam('start');
+		print_word(strings[current_word]);
+	}
+	else
+	{
+		print_word('SPACE');
+		$('#front').prepend('Focus on the red letter and press ');
+		$('#back').append(' to start and pause/unpause');
+	}
+	if($.urlParam('url'))
+	{
+		$('#url').val(decodeURIComponent($.urlParam('url')));
+	}
+	if($.urlParam('start'))
+	{
+		$('#start').val($.urlParam('start'));
+	}
+
 	$(document).keydown(function(e){
 		if(e.keyCode == 32) //space
 		{
@@ -81,5 +112,4 @@ $().ready(function(){
 			}
 		}
 	});
-	strings = reader_text.split(/[ (\n)]+/)
 });

@@ -16,6 +16,10 @@ form {
 	display: inline-block;
 }
 
+#start {
+	width: 50px;
+}
+
 #reader {
 	color: white;
 	text-size: 24px;

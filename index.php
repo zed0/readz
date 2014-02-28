@@ -45,8 +45,9 @@
 				<option value="128px">128px</option>
 			</select>
 			<form id="chooseURL" action="index.php" method="get">
-				<input type="text" name="url" placeholder="Create from URL"/>
-				<input type="submit" value="submit" />
+				<input type="text" name="url" id="url" placeholder="Create from URL" />
+				<input type="text" name="start" id="start" value="0" />
+				<input type="submit" value="Save" />
 			</form>
 		</div>
 		<script src="main.js"></script>
