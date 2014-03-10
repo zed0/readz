@@ -11,13 +11,15 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="main.css" />
+		<link rel="stylesheet" href="spectrum.css" />
 		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="spectrum.js"></script>
 		<script>
 			var reader_text = <?php echo(json_encode($text)); ?>
 		</script>
 	</head>
 	<body>
-		<table id="reader">
+		<table class="reader">
 			<tr>
 				<td id="front">
 				</td>
@@ -38,8 +40,8 @@
 			<select name="size" id="size">
 				<option value="16px">16px</option>
 				<option value="18px">18px</option>
-				<option selected="selected" value="24px">24px</option>
-				<option value="32px">32px</option>
+				<option value="24px">24px</option>
+				<option selected="selected" value="32px">32px</option>
 				<option value="48px">48px</option>
 				<option value="64px">64px</option>
 				<option value="128px">128px</option>
@@ -49,6 +51,40 @@
 				<input type="text" name="start" id="start" value="0" />
 				<input type="submit" value="Save" />
 			</form>
+			<input type="button" name="show-highlight" id="show-highlight" value="Colors..." />
+		</div>
+		<div id="highlights">
+			<table id="pattern-holder">
+				<tr>
+					<td>Background</td>
+					<td>
+						<input type="text" name="background-color" id="background-color" value="0" />
+					</td>
+				</tr>
+				<tr>
+					<td>Main text</td>
+					<td>
+						<input type="text" name="text-color" id="text-color" value="0" />
+					</td>
+				</tr>
+				<tr>
+					<td>Focused text</td>
+					<td>
+						<input type="text" name="focus-color" id="focus-color" value="0" />
+					</td>
+				</tr>
+				<tr>
+					<td>Quoted text</td>
+					<td>
+						<input type="text" name="quote-color" id="quote-color" value="0" />
+					</td>
+				</tr>
+				<tr>
+					<th>Add Pattern</th>
+					<th>Color</th>
+				</tr>
+			</table>
+			<input type="button" name="add-highlight" id="add-highlight" value='+'/>
 		</div>
 		<script src="main.js"></script>
 	</body>

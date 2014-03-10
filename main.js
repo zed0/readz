@@ -4,6 +4,13 @@ var paused = true;
 var current_word = 0;
 var strings = '';
 var in_quote = false;
+var text_color = '#FFFFFF';
+var focus_color = '#FF0000';
+var background_color = '#000000';
+var quote_color = '#87CEEB';
+var regexes = [];
+var colors = [];
+var stylesheet = document.styleSheets[0];
 
 $.urlParam = function(name){
 	var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -42,27 +49,30 @@ function print_word(string)
 	{
 		in_quote = true;
 	}
-	if(in_quote)
-	{
-		$('#reader').css('color', 'skyblue');
-	}
-	else
-	{
-		$('#reader').css('color', 'white');
-	}
 	var index = hl_index(string);
 	var start = string.substring(0, index);
 	var middle = string.substring(index, index+1);
 	var end = string.substring(index+1);
-	$('#front').html(start);
 	var compound_string = '';
-	compound_string += '<span id="middle">';
+	compound_string += '<span class="focus">';
 	compound_string += middle;
-	compound_string += '</span><span id="end">';
-	compound_string += end;
 	compound_string += '</span>';
+	compound_string += end;
+	$.each(regexes, function(key, value){
+		if(string.match(value))
+		{
+			compound_string = '<span style="color: ' + colors[key] + ';">' + compound_string + '</span>';
+			start = '<span style="color: ' + colors[key] + ';">' + start + '</span>';
+		}
+	});
+	if(in_quote)
+	{
+		start = '<span class="quote">' + start + '</span>';
+		compound_string = '<span class="quote">' + compound_string + '</span>';
+	}
+	$('#front').html(start);
 	$('#back').html(compound_string);
-	if(string.slice(-1) == '"')
+	if(string.match(/.+"/))
 	{
 		in_quote = false;
 	}
@@ -76,7 +86,7 @@ function changeSpeed()
 
 function changeSize()
 {
-	$('#reader').css('font-size', $('#size').val());
+	$('.reader').css('font-size', $('#size').val());
 	$('#size').blur();
 }
 
@@ -93,12 +103,124 @@ var repeater = function(){
 	}
 }
 
+function setStyle(selector, rule)
+{
+	if (stylesheet.insertRule) {
+		stylesheet.insertRule(selector + rule, stylesheet.cssRules.length);
+	} else if (stylesheet.addRule) {
+		stylesheet.addRule(selector, rule, -1);
+	}
+}
+
+function setTextColor(color)
+{
+	text_color = color;
+	setStyle('body', '{color: ' + color + '}');
+	$('#text-color').attr('value', color);
+}
+
+function setFocusColor(color)
+{
+	focus_color = color;
+	setStyle('.focus', '{color: ' + color + '}');
+	$('#focus-color').attr('value', color);
+}
+
+function setBackgroundColor(color)
+{
+	background_color = color;
+	setStyle('body', '{background-color: ' + color + '}');
+	$('#background-color').attr('value', color);
+}
+
+function setQuoteColor(color)
+{
+	quote_color = color;
+	setStyle('.quote', '{color: ' + color + '}');
+	$('#quote-color').attr('value', color);
+}
+
+function changeHighlight(prev)
+{
+	var index = $(prev).attr('data');
+	if($('#' + index + '-pattern').val() != '')
+	{
+		regexes[index] = $('#' + index + '-pattern').val();
+		colors[index] = $('#' + index + '-color').spectrum("get").toHexString();
+	}
+}
+
+function addHighlight()
+{
+	if(typeof this.num === 'undefined')
+	{
+		this.num = 0;
+	}
+	else
+	{
+		this.num++;
+	}
+	var html = '<tr><td><input type="text" id="' + this.num + '-pattern" data="' + this.num + '" /></td><td><input type="text" id="' + this.num + '-color" data="' + this.num + '" /></td></tr>';
+	$('#pattern-holder').append(html);
+	var current = $('#' + this.num + '-color').spectrum({
+		clickoutFiresChange: true,
+		color: text_color,
+		change: function(color){changeHighlight(current)},
+		move: function(color){changeHighlight(current)}
+	});
+	$('#' + this.num + '-pattern').on('input change keyup', function(){changeHighlight(this)});
+}
+
 $().ready(function(){
 	strings = reader_text.split(/[ (\n)]+/)
-
+	
+	$('#show-highlight').on('click', function(){$('#highlights').toggle();});
+	$('#add-highlight').on('click', function(){addHighlight();});
+	addHighlight();
 	$('#size').on('input change keyup', function(){changeSize();});
 	$('#speed').on('input change keyup', function(){changeSpeed();});
+	if($.urlParam('text-color')!=null)
+	{
+		setTextColor(decodeURIComponent($.urlParam('text-color')));
+	}
+	if($.urlParam('focus-color')!=null)
+	{
+		setFocusColor(decodeURIComponent($.urlParam('focus-color')));
+	}
+	if($.urlParam('background-color')!=null)
+	{
+		setBackgroundColor(decodeURIComponent($.urlParam('background-color')));
+	}
+	if($.urlParam('quote-color')!=null)
+	{
+		setQuoteColor(decodeURIComponent($.urlParam('quote-color')));
+	}
+	$("#text-color").spectrum({
+		clickoutFiresChange: true,
+		color: text_color,
+		change: setTextColor,
+		move: setTextColor
+	});
+	$("#focus-color").spectrum({
+		clickoutFiresChange: true,
+		color: focus_color,
+		change: setFocusColor,
+		move: setFocusColor
+	});
+	$("#background-color").spectrum({
+		clickoutFiresChange: true,
+		color: background_color,
+		change: setBackgroundColor,
+		move: setBackgroundColor
+	});
+	$("#quote-color").spectrum({
+		clickoutFiresChange: true,
+		color: quote_color,
+		change: setQuoteColor,
+		move: setQuoteColor
+	});
 
+	current_word = $.urlParam('start');
 	if($.urlParam('start')>0)
 	{
 		current_word = $.urlParam('start');

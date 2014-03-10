@@ -1,6 +1,8 @@
 body {
 	margin: 0;
 	background-color: black;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	color: white;
 }
 
 #controls {
@@ -20,23 +22,12 @@ form {
 	width: 50px;
 }
 
-#reader {
-	color: white;
-	text-size: 24px;
-	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	//letter-spacing: 2px;
-}
-
 #front {
 	text-align: right;
 }
 
-#middle {
-	color: red;
-	text-align: left;
-}
-
-table {
+.reader {
+	font-size: 32px;
 	position: absolute;
 	height: 100%;
 	width: 100%;
@@ -44,9 +35,26 @@ table {
 	table-layout: fixed;
 }
 
-td {
+.reader td {
 	padding: 0px;
 	margin: 0px;
 	vertical-align: middle;
 	border: 0px;
+}
+
+.quote {
+	color: skyblue;
+}
+
+.focus {
+	color: red;
+	text-align: left;
+}
+
+#highlights {
+	display: none;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	border: 1px solid;
 }
